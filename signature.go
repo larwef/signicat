@@ -17,8 +17,8 @@ func (s *SignatureService) CreateDocument(createReq *CreateDocumentRequest) (*Do
 		return nil, err
 	}
 
-	var response *Document
-	if err := s.client.Do(req, response); err != nil {
+	response := new(Document)
+	if err := s.client.Do(req, &response); err != nil {
 		return nil, err
 	}
 
@@ -33,7 +33,7 @@ func (s *SignatureService) RetrieveDocument(documentID string) (*Document, error
 		return nil, err
 	}
 
-	var response *Document
+	response := new(Document)
 	if err := s.client.Do(req, response); err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *SignatureService) RetrieveDocumentStatus(documentID string) (*Status, e
 		return nil, err
 	}
 
-	var response *Status
+	response := new(Status)
 	if err := s.client.Do(req, response); err != nil {
 		return nil, err
 	}
