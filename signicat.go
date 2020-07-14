@@ -2,6 +2,7 @@ package signicat
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -88,9 +89,18 @@ func (c *Client) NewRequest(method, relativeURL string, body interface{}) (*http
 }
 
 // Do sends an API request. The response is decoded and stored in the value pointed to by v unless an error is returned.
-func (c *Client) Do(req *http.Request, v interface{}) error {
+func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) error {
+	req = req.WithContext(ctx)
+
 	res, err := c.client.Do(req)
 	if err != nil {
+		// Return the error from the context if it is canceled.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		return err
 	}
 	defer res.Body.Close()

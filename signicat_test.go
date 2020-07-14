@@ -2,6 +2,7 @@ package signicat
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -40,7 +41,7 @@ func TestSignatureService_CreateDocument(t *testing.T) {
 		}
 	})
 
-	document, err := client.Signature.CreateDocument(&CreateDocumentRequest{})
+	document, err := client.Signature.CreateDocument(context.Background(), &CreateDocumentRequest{})
 	assert.NoError(t, err)
 	assert.Equal(t, "someDocumentId", document.DocumentID)
 }
@@ -57,7 +58,7 @@ func TestSignatureService_RetrieveDocument(t *testing.T) {
 		}
 	})
 
-	document, err := client.Signature.RetrieveDocument("someDocumentId")
+	document, err := client.Signature.RetrieveDocument(context.Background(), "someDocumentId")
 	assert.NoError(t, err)
 	assert.Equal(t, "someDocumentId", document.DocumentID)
 }
@@ -74,7 +75,7 @@ func TestSignatureService_RetrieveDocumentStatus(t *testing.T) {
 		}
 	})
 
-	status, err := client.Signature.RetrieveDocumentStatus("someDocumentId")
+	status, err := client.Signature.RetrieveDocumentStatus(context.Background(), "someDocumentId")
 	assert.NoError(t, err)
 	assert.Equal(t, DocumentStatusSigned, status.DocumentStatus)
 }
@@ -94,7 +95,7 @@ func TestSignatureService_RetrieveFile(t *testing.T) {
 	})
 
 	var buf bytes.Buffer
-	err := client.Signature.RetrieveFile("someDocumentId", FileFormatPades, true, &buf)
+	err := client.Signature.RetrieveFile(context.Background(), "someDocumentId", FileFormatPades, true, &buf)
 	assert.NoError(t, err)
 	assert.Equal(t, "response", buf.String())
 }

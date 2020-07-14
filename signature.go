@@ -1,6 +1,7 @@
 package signicat
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -66,14 +67,14 @@ type SignatureService service
 
 // CreateDocument creates a new document. In the response you will receive a document ID to retrieve info about the document at a
 // later time. You also receive a URL and unique identifier per signer.
-func (s *SignatureService) CreateDocument(createReq *CreateDocumentRequest) (*Document, error) {
+func (s *SignatureService) CreateDocument(ctx context.Context, createReq *CreateDocumentRequest) (*Document, error) {
 	req, err := s.client.NewRequest(http.MethodPost, "/signature/documents", createReq)
 	if err != nil {
 		return nil, err
 	}
 
 	response := new(Document)
-	if err := s.client.Do(req, &response); err != nil {
+	if err := s.client.Do(ctx, req, &response); err != nil {
 		return nil, err
 	}
 
@@ -81,7 +82,7 @@ func (s *SignatureService) CreateDocument(createReq *CreateDocumentRequest) (*Do
 }
 
 // RetrieveDocument retrieves details of a single document.
-func (s *SignatureService) RetrieveDocument(documentID string) (*Document, error) {
+func (s *SignatureService) RetrieveDocument(ctx context.Context, documentID string) (*Document, error) {
 	u := fmt.Sprintf("/signature/documents/%s", documentID)
 	req, err := s.client.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
@@ -89,7 +90,7 @@ func (s *SignatureService) RetrieveDocument(documentID string) (*Document, error
 	}
 
 	response := new(Document)
-	if err := s.client.Do(req, response); err != nil {
+	if err := s.client.Do(ctx, req, response); err != nil {
 		return nil, err
 	}
 
@@ -97,7 +98,7 @@ func (s *SignatureService) RetrieveDocument(documentID string) (*Document, error
 }
 
 // RetrieveDocumentStatus gets the status of a document.
-func (s *SignatureService) RetrieveDocumentStatus(documentID string) (*Status, error) {
+func (s *SignatureService) RetrieveDocumentStatus(ctx context.Context, documentID string) (*Status, error) {
 	u := fmt.Sprintf("/signature/documents/%s/status", documentID)
 	req, err := s.client.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
@@ -105,7 +106,7 @@ func (s *SignatureService) RetrieveDocumentStatus(documentID string) (*Status, e
 	}
 
 	response := new(Status)
-	if err := s.client.Do(req, response); err != nil {
+	if err := s.client.Do(ctx, req, response); err != nil {
 		return nil, err
 	}
 
@@ -114,7 +115,7 @@ func (s *SignatureService) RetrieveDocumentStatus(documentID string) (*Status, e
 
 // RetrieveFile retrieves the signed document file and stored it in the value pointed to by v. v can implement io.Writer. Eg.
 // write to a file.
-func (s *SignatureService) RetrieveFile(documentID, format string, originalFileName bool, v interface{}) error {
+func (s *SignatureService) RetrieveFile(ctx context.Context, documentID, format string, originalFileName bool, v interface{}) error {
 	u, err := url.Parse(fmt.Sprintf("/signature/documents/%s/files", documentID))
 	if err != nil {
 		return err
@@ -130,7 +131,7 @@ func (s *SignatureService) RetrieveFile(documentID, format string, originalFileN
 		return err
 	}
 
-	if err := s.client.Do(req, v); err != nil {
+	if err := s.client.Do(ctx, req, v); err != nil {
 		return err
 	}
 
