@@ -9,6 +9,10 @@ import (
 	"net/url"
 )
 
+const (
+	defaultBaseURL = "https://api.idfy.io/"
+)
+
 // A Client manages communication with the Signicat API.
 type Client struct {
 	client  *http.Client
@@ -23,9 +27,19 @@ type service struct {
 	client *Client
 }
 
-// NewClient returns a new Signicat API client. To use API methods which require authentication, provide an http.Client that will
-// perform the authentication for you. Most likelely you want to use Oauth2 and the golang.org/x/oauth2 package.
-func NewClient(httpClient *http.Client, baseURL string) (*Client, error) {
+// NewClient returns a new client with the default base url.
+func NewClient(httpClient *http.Client) *Client {
+	client, err := NewClientWithURL(httpClient, defaultBaseURL)
+	if err != nil {
+		panic("unable to initiate default client. This should not happen")
+	}
+
+	return client
+}
+
+// NewClientWithURL returns a new Signicat API client. To use API methods which require authentication, provide an http.Client
+// that will perform the authentication for you. Most likelely you want to use Oauth2 and the golang.org/x/oauth2 package.
+func NewClientWithURL(httpClient *http.Client, baseURL string) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}

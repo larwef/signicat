@@ -19,7 +19,7 @@ func setup() (*Client, *http.ServeMux, func()) {
 
 	server := httptest.NewServer(apiHandler)
 
-	client, err := NewClient(&http.Client{}, server.URL)
+	client, err := NewClientWithURL(&http.Client{}, server.URL)
 	if err != nil {
 		panic(fmt.Sprintf("couldnt set up test client: %v", err))
 	}

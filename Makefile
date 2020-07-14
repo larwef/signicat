@@ -1,7 +1,4 @@
-all: test build-linux build-mac build-windows
-
-run:
-	go run cmd/kitsune/main.go
+all: test
 
 # PHONY used to mitigate conflict with dir name test
 .PHONY: test
