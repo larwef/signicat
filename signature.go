@@ -3,7 +3,62 @@ package signicat
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 	"time"
+)
+
+// Available redirection modes.
+const (
+	RedirectModeDoNotRedirect                     = "donot_redirect"
+	RedirectModeRedirect                          = "redirect"
+	RedirectModeIframeWithWebMessaging            = "iframe_with_webmessaging"
+	RedirectModeIframeWithRedirect                = "iframe_with_redirect"
+	RedirectModeIframeWithRedirectAndWebMessaging = "iframe_with_redirect_and_webmessaging"
+
+	// Available signature mechanisms.
+	MechanismsPkiSignature                  = "pkisignature"
+	MechanismsIdentification                = "identification"
+	MechanismsHandwritten                   = "handwritten"
+	MechanismsHandWrittenWithIdentification = "handwritten_with_identification"
+
+	// Available notification setups.
+	NotificationSetupOff       = "off"
+	NotificationSetupSendSms   = "sendSms"
+	NotificationSetupSendEmail = "sendEmail"
+	NotificationSetupSendBoth  = "sendBoth"
+
+	// Available signature methods.
+	SignatureMethodNoBankIDMobile     = "no_bankid_mobile"
+	SignatureMethodNoBankIDNetCentric = "no_bankid_netcentric"
+	SignatureMethodNoBuypass          = "no_buypass"
+	SignatureMethodSeBankID           = "se_bankid"
+	SignatureMethodDkNemID            = "dk_nemid"
+	SignatureMethodFiTupas            = "fi_tupas"
+	SignatureMethodFiMobiilivarmenne  = "fi_mobiilivarmenne"
+	SignatureMethodFiEid              = "fi_eid"
+	SignatureMethodSmsOtp             = "sms_otp"
+	SignatureMethodUnknown            = "unknown"
+
+	// Avalable options for personalInfoOrigin field.
+	PersonalInfoOriginUnknown       = "unknown"
+	PersonalInfoOriginEid           = "eid"
+	PersonalInfoOriginUserFormInput = "userFormInput"
+
+	// Available document statuses.
+	DocumentStatusUnsigned              = "unsigned"
+	DocumentStatusWaitingForAttachments = "waiting_for_attachments"
+	DocumentStatusPartialSigned         = "partialsigned"
+	DocumentStatusSigned                = "signed"
+	DocumentStatusCanceled              = "canceled"
+	DocumentStatusExpired               = "expired"
+
+	// Available file formats.
+	FileFormatUnsigned          = "unsigned"
+	FileFormatNative            = "native"
+	FileFormatStandardPackaging = "standard_packaging"
+	FileFormatPades             = "pades"
+	FileFormatXades             = "xades"
 )
 
 // SignatureService handles communication with the Signature API.
@@ -57,6 +112,31 @@ func (s *SignatureService) RetrieveDocumentStatus(documentID string) (*Status, e
 	return response, nil
 }
 
+// RetrieveFile retrieves the signed document file and stored it in the value pointed to by v. v can implement io.Writer. Eg.
+// write to a file.
+func (s *SignatureService) RetrieveFile(documentID, format string, originalFileName bool, v interface{}) error {
+	u, err := url.Parse(fmt.Sprintf("/signature/documents/%s/files", documentID))
+	if err != nil {
+		return err
+	}
+
+	params := u.Query()
+	params.Set("fileFormat", format)
+	params.Set("originalFileName", strconv.FormatBool(originalFileName))
+	u.RawQuery = params.Encode()
+
+	req, err := s.client.NewRequest(http.MethodGet, u.String(), nil)
+	if err != nil {
+		return err
+	}
+
+	if err := s.client.Do(req, v); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateDocumentRequest is ...
 type CreateDocumentRequest struct {
 	Title          string           `json:"title"`
@@ -78,40 +158,17 @@ type SignerRequest struct {
 
 // RedirectSettings is ...
 type RedirectSettings struct {
-	RedirectMode RedirectMode `json:"redirectMode"`
-	Domain       string       `json:"domain,omitempty"`
-	Error        string       `json:"error,omitempty"`
-	Cancel       string       `json:"cancel,omitempty"`
-	Success      string       `json:"success,omitempty"`
+	RedirectMode string `json:"redirectMode"`
+	Domain       string `json:"domain,omitempty"`
+	Error        string `json:"error,omitempty"`
+	Cancel       string `json:"cancel,omitempty"`
+	Success      string `json:"success,omitempty"`
 }
-
-// RedirectMode is ...
-type RedirectMode string
-
-// Available redirection modes.
-const (
-	RedirectModeDoNotRedirect                     RedirectMode = "donot_redirect"
-	RedirectModeRedirect                                       = "redirect"
-	RedirectModeIframeWithWebMessaging                         = "iframe_with_webmessaging"
-	RedirectModeIframeWithRedirect                             = "iframe_with_redirect"
-	RedirectModeIframeWithRedirectAndWebMessaging              = "iframe_with_redirect_and_webmessaging"
-)
 
 // SignatureType is ...
 type SignatureType struct {
-	Mechanism Mechanisms `json:"mechanism"`
+	Mechanism string `json:"mechanism"`
 }
-
-// Mechanisms is ...
-type Mechanisms string
-
-// Available signature mechanisms.
-const (
-	MechanismsPkiSignature                  Mechanisms = "pkisignature"
-	MechanismsIdentification                           = "identification"
-	MechanismsHandwritten                              = "handwritten"
-	MechanismsHandWrittenWithIdentification            = "handwritten_with_identification"
-)
 
 // SignerInfo is ...
 type SignerInfo struct {
@@ -160,24 +217,13 @@ type Notifications struct {
 
 // Setup is ...
 type Setup struct {
-	Request          NotificationSetup `json:"request,omitempty"`
-	Reminder         NotificationSetup `json:"reminder,omitempty"`
-	SignatureReceipt NotificationSetup `json:"signatureReceipt,omitempty"`
-	FinalReceipt     NotificationSetup `json:"finalReceipt,omitempty"`
-	Canceled         NotificationSetup `json:"canceled,omitempty"`
-	Expired          NotificationSetup `json:"expired,omitempty"`
+	Request          string `json:"request,omitempty"`
+	Reminder         string `json:"reminder,omitempty"`
+	SignatureReceipt string `json:"signatureReceipt,omitempty"`
+	FinalReceipt     string `json:"finalReceipt,omitempty"`
+	Canceled         string `json:"canceled,omitempty"`
+	Expired          string `json:"expired,omitempty"`
 }
-
-// NotificationSetup is ...
-type NotificationSetup string
-
-// Available notification setups.
-const (
-	NotificationSetupOff       NotificationSetup = "off"
-	NotificationSetupSendSms                     = "sendSms"
-	NotificationSetupSendEmail                   = "sendEmail"
-	NotificationSetupSendBoth                    = "sendBoth"
-)
 
 // Document is ...
 type Document struct {
@@ -209,7 +255,7 @@ type SignerResponse struct {
 
 // DocumentSignature is ...
 type DocumentSignature struct {
-	SignatureMethod         SignatureMethod       `json:"signatureMethod"`
+	SignatureMethod         string                `json:"signatureMethod"`
 	FullName                string                `json:"fullName,omitempty"`
 	FirstName               string                `json:"firstName,omitempty"`
 	LastName                string                `json:"lastName,omitempty"`
@@ -219,26 +265,9 @@ type DocumentSignature struct {
 	SignatureMethodUniqueID string                `json:"signatureMethodUniqueId,omitempty"`
 	SocialSecurityNumber    *SocialSecurityNumber `json:"socialSecurityNumber,omitempty"`
 	ClientIP                string                `json:"clientIp,omitempty"`
-	Mechanism               Mechanisms            `json:"mechanism,omitempty"`
-	PersonalInfoOrigin      PersonalInfoOrigin    `json:"personalInfoOrigin,omitempty"`
+	Mechanism               string                `json:"mechanism,omitempty"`
+	PersonalInfoOrigin      string                `json:"personalInfoOrigin,omitempty"`
 }
-
-// SignatureMethod is ...
-type SignatureMethod string
-
-// Available signature methods.
-const (
-	SignatureMethodNoBankIDMobile     SignatureMethod = "no_bankid_mobile"
-	SignatureMethodNoBankIDNetCentric                 = "no_bankid_netcentric"
-	SignatureMethodNoBuypass                          = "no_buypass"
-	SignatureMethodSeBankID                           = "se_bankid"
-	SignatureMethodDkNemID                            = "dk_nemid"
-	SignatureMethodFiTupas                            = "fi_tupas"
-	SignatureMethodFiMobiilivarmenne                  = "fi_mobiilivarmenne"
-	SignatureMethodFiEid                              = "fi_eid"
-	SignatureMethodSmsOtp                             = "sms_otp"
-	SignatureMethodUnknown                            = "unknown"
-)
 
 // SocialSecurityNumber is ...
 type SocialSecurityNumber struct {
@@ -246,43 +275,8 @@ type SocialSecurityNumber struct {
 	CountryCode string `json:"countryCode,omitempty"`
 }
 
-// PersonalInfoOrigin is ...
-type PersonalInfoOrigin string
-
-// Avalable options for personalInfoOrigin field.
-const (
-	PersonalInfoOriginUnknown       PersonalInfoOrigin = "unknown"
-	PersonalInfoOriginEid                              = "eid"
-	PersonalInfoOriginUserFormInput                    = "userFormInput"
-)
-
 // Status is ...
 type Status struct {
-	DocumentStatus    DocumentStatus `json:"documentStatus,omitempty"`
-	CompletedPackages []FileFormat   `json:"completedPackages,omitempty"`
+	DocumentStatus    string   `json:"documentStatus,omitempty"`
+	CompletedPackages []string `json:"completedPackages,omitempty"`
 }
-
-// DocumentStatus is ...
-type DocumentStatus string
-
-// Available document statuses.
-const (
-	DocumentStatusUnsigned              DocumentStatus = "unsigned"
-	DocumentStatusWaitingForAttachments                = "waiting_for_attachments"
-	DocumentStatusPartialSigned                        = "partialsigned"
-	DocumentStatusSigned                               = "signed"
-	DocumentStatusCanceled                             = "canceled"
-	DocumentStatusExpired                              = "expired"
-)
-
-// FileFormat is ...
-type FileFormat string
-
-// Available file formats.
-const (
-	FileFormatUnsigned          FileFormat = "unsigned"
-	FileFormatNative                       = "native"
-	FileFormatStandardPackaging            = "standard_packaging"
-	FileFormatPades                        = "pades"
-	FileFormatXades                        = "xades"
-)

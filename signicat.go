@@ -87,9 +87,16 @@ func (c *Client) Do(req *http.Request, v interface{}) error {
 	}
 
 	if v != nil {
-		// ignore EOF errors caused by empty response body
-		if err = json.NewDecoder(res.Body).Decode(v); err != nil && err != io.EOF {
-			return err
+		// Write directly if v implements io.Writer.
+		if w, ok := v.(io.Writer); ok {
+			if _, err := io.Copy(w, res.Body); err != nil {
+				return err
+			}
+		} else {
+			// Ignore EOF errors caused by empty response body.
+			if err = json.NewDecoder(res.Body).Decode(v); err != nil && err != io.EOF {
+				return err
+			}
 		}
 	}
 
