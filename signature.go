@@ -23,6 +23,12 @@ const (
 	MechanismsHandwritten                   = "handwritten"
 	MechanismsHandWrittenWithIdentification = "handwritten_with_identification"
 
+	// Available auth mechanism
+	AuthMechanismOff          = "off"
+	AuthMechanismEid          = "eid"
+	AuthMechanismSmsOtp       = "smsOtp"
+	AuthMechanismEidAndSmsOtp = "eidAndSmsOtp"
+
 	// Available notification setups.
 	NotificationSetupOff       = "off"
 	NotificationSetupSendSms   = "sendSms"
@@ -153,6 +159,7 @@ type SignerRequest struct {
 	ExternalSignerID string            `json:"externalSignerId"`
 	RedirectSettings *RedirectSettings `json:"redirectSettings"`
 	SignatureType    *SignatureType    `json:"signatureType"`
+	Authentication   *Authentication   `json:"authentication"`
 	SignerInfo       *SignerInfo       `json:"signerInfo,omitempty"`
 	Notifications    *Notifications    `json:"notifications,omitempty"`
 }
@@ -169,6 +176,13 @@ type RedirectSettings struct {
 // SignatureType is ...
 type SignatureType struct {
 	Mechanism string `json:"mechanism"`
+}
+
+// Authentication is ...
+type Authentication struct {
+	Mechanism               string `json:"mechanism"`
+	SocialSecurityNumber    string `json:"socialSecurityNumber"`
+	SignatureMethodUniqueId string `json:"signatureMethodUniqueId"`
 }
 
 // SignerInfo is ...
