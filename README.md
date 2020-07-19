@@ -3,7 +3,7 @@ Go client for interacting with Signicat APIs.
 
 NB: All the objects may not be complete. Only focusing on what i find usefull at the moment, but extending shouldn't be hard.
 
-For more information see https://developer.signicat.io/.
+For more information about Signicat see https://developer.signicat.io/.
 
 # Supported API Calls
 See https://developer.signicat.io/apis/express-api.html for API documentation.
