@@ -29,6 +29,50 @@ const (
 	AuthMechanismSmsOtp       = "smsOtp"
 	AuthMechanismEidAndSmsOtp = "eidAndSmsOtp"
 
+	// Available color themes.
+	ColorThemeDefault    = "Default"
+	ColorThemeBlack      = "Black"
+	ColorThemeBlue       = "Blue"
+	ColorThemeCyan       = "Cyan"
+	ColorThemeDark       = "Dark"
+	ColorThemeLime       = "Lime"
+	ColorThemeNeutral    = "Neutral"
+	ColorThemePink       = "Pink"
+	ColorThemePurple     = "Purple"
+	ColorThemeRed        = "Red"
+	ColorThemeTeal       = "Teal"
+	ColorThemeIndigo     = "Indigo"
+	ColorThemeLightBlue  = "LightBlue"
+	ColorThemeDeepPurple = "DeepPurple"
+	ColorThemeGreen      = "Green"
+	ColorThemeLightGreen = "LightGreen"
+	ColorThemeYellow     = "Yellow"
+	ColorThemeAmber      = "Amber"
+	ColorThemeOrange     = "Orange"
+	ColorThemeDeepOrange = "DeepOrange"
+	ColorThemeBrown      = "Brown"
+	ColorThemeGray       = "Gray"
+	ColorThemeBlueGray   = "BlueGray"
+	ColorThemeOceanGreen = "OceanGreen"
+	ColorThemeGreenOcean = "GreenOcean"
+
+	// Available theme modes.
+	ThemeModeDefault = "Default"
+	ThemeModeLight   = "Light"
+	ThemeModeDark    = "Dark"
+
+	// Available spinners.
+	SpinnerDocument = "Document"
+	SpinnerClassic  = "Classic"
+	SpinnerCubes    = "Cubes"
+	SpinnerBounce   = "Bounce"
+
+	// Available top bars.
+	TopBarDefault  = "Default"
+	TopBarVisible  = "Visible"
+	TopBarOnlyMenu = "OnlyMenu"
+	TopBarHidden   = "Hidden"
+
 	// Available notification setups.
 	NotificationSetupOff       = "off"
 	NotificationSetupSendSms   = "sendSms"
@@ -73,6 +117,18 @@ const (
 	LanguageDanish    = "DA"
 	LanguageSweedish  = "SV"
 	LanguageFinnish   = "FI"
+
+	// Available merge-fields. See https://developer.signicat.io/docs/signature/create-document.html#notification-merge-fields.
+	MergeFieldDocumentTitle          = "{document-title}"
+	MergeFieldDocumentDescription    = "{document-description}"
+	MergeFieldSignableDocumetTitles  = "{signable-document-titles}"
+	MergeFieldReadOnlyDocumentTitles = "{readonly-document-titles}"
+	MergeFieldDeadline               = "{deadline}"
+	MergeFieldSignedTime             = "{signed-time}"
+	MergeFieldSignedDate             = "{signed-date}"
+	MergeFieldSignedName             = "{signed-name}"
+	MergeFieldSignatureMethod        = "{signature-method}"
+	MergeFieldURL                    = "{url}"
 )
 
 // SignatureService handles communication with the Signature API.
@@ -167,8 +223,9 @@ type SignerRequest struct {
 	ExternalSignerID string            `json:"externalSignerId"`
 	RedirectSettings *RedirectSettings `json:"redirectSettings"`
 	SignatureType    *SignatureType    `json:"signatureType"`
-	Authentication   *Authentication   `json:"authentication"`
 	SignerInfo       *SignerInfo       `json:"signerInfo,omitempty"`
+	Authentication   *Authentication   `json:"authentication,omitempty"`
+	UI               *UI               `json:"ui,omitempty"`
 	Notifications    *Notifications    `json:"notifications,omitempty"`
 }
 
@@ -188,9 +245,24 @@ type SignatureType struct {
 
 // Authentication is ...
 type Authentication struct {
-	Mechanism               string `json:"mechanism"`
-	SocialSecurityNumber    string `json:"socialSecurityNumber"`
-	SignatureMethodUniqueId string `json:"signatureMethodUniqueId"`
+	Mechanism               string `json:"mechanism,omitempty"`
+	SocialSecurityNumber    string `json:"socialSecurityNumber,omitempty"`
+	SignatureMethodUniqueID string `json:"signatureMethodUniqueId,omitempty"`
+}
+
+// UI is ...
+type UI struct {
+	Language string   `json:"language,omitempty"`
+	Styling  *Styling `json:"styling,omitempty"`
+}
+
+// Styling is ...
+type Styling struct {
+	ColorTheme      string `json:"colorTheme,omitempty"`
+	ThemeMode       string `json:"themeMode,omitempty"`
+	Spinner         string `json:"spinner,omitempty"`
+	TopBar          string `json:"topBar,omitempty"`
+	BackgroundColor string `json:"backgroundColor"`
 }
 
 // SignerInfo is ...
