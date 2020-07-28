@@ -66,6 +66,13 @@ const (
 	FileFormatStandardPackaging = "standard_packaging"
 	FileFormatPades             = "pades"
 	FileFormatXades             = "xades"
+
+	// Available languages.
+	LanguageEnglish   = "EN"
+	LanguageNorwegian = "NO"
+	LanguageDanish    = "DA"
+	LanguageSweedish  = "SV"
+	LanguageFinnish   = "FI"
 )
 
 // SignatureService handles communication with the Signature API.
@@ -152,6 +159,7 @@ type CreateDocumentRequest struct {
 	ContactDetails *ContactDetails  `json:"contactDetails"`
 	ExternalID     string           `json:"externalId"`
 	Description    string           `json:"description,omitempty"`
+	Notification   *Notification    `json:"notification"`
 }
 
 // SignerRequest is ...
@@ -223,6 +231,79 @@ type ContactDetails struct {
 	Phone string `json:"phone,omitempty"`
 	Email string `json:"email"`
 	URL   string `json:"url,omitempty"`
+}
+
+// Notification is ...
+type Notification struct {
+	SignRequest      *SignRequest      `json:"signRequest,omitEmpty"`
+	Reminder         *Reminder         `json:"reminder,omitEmpty"`
+	SignatureReceipt *SignatureReceipt `json:"signatureReceipt,omitEmpty"`
+	FinalReceipt     *FinalReceipt     `json:"finalReceipt,omitEmpty"`
+	CanceledReceipt  *CanceledReceipt  `json:"canceledReceipt,omitEmpty"`
+	ExpiredReceipt   *ExpiredReceipt   `json:"expiredReceipt,omitEmpty"`
+}
+
+// SignRequest is ...
+type SignRequest struct {
+	IncludeOriginalFile bool     `json:"includeOriginalFile,omitEmpty"`
+	Email               []*Email `json:"email,omitEmpty"`
+	Sms                 []*Sms   `json:"sms,omitEmpty"`
+}
+
+// Email is ...
+type Email struct {
+	Language   string `json:"language"`
+	Subject    string `json:"subject,omitEmpty"`
+	Text       string `json:"text,omitEmpty"`
+	SenderName string `json:"senderName,omitEmpty"`
+}
+
+// Sms is ...
+type Sms struct {
+	Language string `json:"language"`
+	Text     string `json:"text,omitEmpty"`
+	Sender   string `json:"sender,omitEmpty"`
+}
+
+// Reminder is ...
+type Reminder struct {
+	ChronSchedule string   `json:"chronSchedule"`
+	MaxReminders  int32    `json:"maxReminders,omitempty"`
+	Email         []*Email `json:"email,omitempty"`
+	Sms           []*Sms   `json:"sms,omitempty"`
+}
+
+// SignatureReceipt is ...
+type SignatureReceipt struct {
+	Email []*Email `json:"email,omitempty"`
+	Sms   []*Sms   `json:"sms,omitempty"`
+}
+
+// FinalReceipt is ...
+type FinalReceipt struct {
+	AdditionalRecipients []*AdditionalRecipient `json:"additionalRecipients,omitempty"`
+	IncludeSignedFile    bool                   `json:"includeSignedFile,omitempty"`
+	Email                []*Email               `json:"email,omitempty"`
+	Sms                  []*Sms                 `json:"sms,omitempty"`
+}
+
+// AdditionalRecipient is ...
+type AdditionalRecipient struct {
+	Language          string            `json:"language,omitempty"`
+	Email             string            `json:"email"`
+	SustomMergeFields map[string]string `json:"sustomMergeFields,omitempty"`
+}
+
+// CanceledReceipt is ...
+type CanceledReceipt struct {
+	Email []*Email `json:"email,omitempty"`
+	Sms   []*Sms   `json:"sms,omitempty"`
+}
+
+// ExpiredReceipt is ...
+type ExpiredReceipt struct {
+	Email []*Email `json:"email,omitempty"`
+	Sms   []*Sms   `json:"sms,omitempty"`
 }
 
 // Notifications is ...
