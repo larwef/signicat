@@ -216,6 +216,7 @@ type CreateDocumentRequest struct {
 	ExternalID     string           `json:"externalId"`
 	Description    string           `json:"description,omitempty"`
 	Notification   *Notification    `json:"notification"`
+	Advanced       *Advanced        `json:"advanced,omitempty"`
 }
 
 // SignerRequest is ...
@@ -337,6 +338,17 @@ type Sms struct {
 	Sender   string `json:"sender,omitEmpty"`
 }
 
+// Advanced is ..
+type Advanced struct {
+	TimeToLive *TimeToLive `json:"timeToLive,omitempty"`
+}
+
+// TimeToLive is ...
+type TimeToLive struct {
+	Deadline         *time.Time `json:"deadline,omitempty"`
+	DeleteAfterHours int32      `json:"deleteAfterHours,omitempty"`
+}
+
 // Reminder is ...
 type Reminder struct {
 	ChronSchedule string   `json:"chronSchedule"`
@@ -403,6 +415,7 @@ type Document struct {
 	ExternalID     string            `json:"externalId,omitempty"`
 	DataToSign     *DataToSign       `json:"dataToSign,omitempty"`
 	ContactDetails *ContactDetails   `json:"contactDetails,omitempty"`
+	Advanced       *Advanced         `json:"advanced,omitempty"`
 }
 
 // SignerResponse is ...
